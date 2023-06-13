@@ -1,38 +1,57 @@
 #
-# Makefile for Sparse Bundle Adjustment projections and Jacobians
+# Makefile for Sparse Bundle Adjustment projections and Jacobians [libsbaprojs.so]
 # modified from Lourakis' sba demo eucsbademo.c
 #
+
+# Determine the operating system, default to unix
+OS = unix
+ifneq ($(shell uname -a | grep -i Darwin),)
+        OS = macOS
+endif
+ifneq ($(shell uname -a | grep -i Windows),)
+        OS = windows
+endif
+ifneq ($(shell uname -a | grep -i Linux),)
+        OS = linux
+endif
+
 CC=gcc
-ARCHFLAGS=-isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk -arch x86_64 -I/usr/local/include -L/usr/local/lib
-CFLAGS=$(ARCHFLAGS) -I.. -O3 -Wall #-g -pg
+CFLAGS=-I.. -O3 -Wall #-g -pg
 OBJS=sbaprojs.o imgproj.o 
 SRCS=sbaprojs.c imgproj.c
 
-
-LAPACKLIBS=-llapack -lblas #-lf2c # On systems with a FORTRAN (not f2c'ed) version of LAPACK, -lf2c is
+ifeq ($(OS),macOS)
+	LAPACKLIBS=-framework Accelerate
+else
+	LAPACKLIBS=-llapack -lblas -lf2c # On systems with a FORTRAN (not f2c'ed) version of LAPACK, -lf2c is
                                  # not necessary; on others -lf2c is equivalent to -lF77 -lI77
 
-#LAPACKLIBS=-L/usr/local/atlas/lib -llapack -lcblas -lf77blas -latlas -lf2c # This works with the ATLAS updated lapack and Linux_P4SSE2
+	#LAPACKLIBS=-L/usr/local/atlas/lib -llapack -lcblas -lf77blas -latlas -lf2c # This works with the ATLAS updated lapack and Linux_P4SSE2
                                                                             # from http://www.netlib.org/atlas/archives/linux/
 
-#LAPACKLIBS=-llapack -lgoto -lpthread -lf2c # This works with GotoBLAS
+	#LAPACKLIBS=-llapack -lgoto -lpthread -lf2c # This works with GotoBLAS
                                             # from http://www.tacc.utexas.edu/resources/software/
 
-#LAPACKLIBS=-L/opt/intel/mkl/8.0.1/lib/32/ -lmkl_lapack -lmkl_ia32 -lguide -lf2c # This works with MKL 8.0.1 from
+	#LAPACKLIBS=-L/opt/intel/mkl/8.0.1/lib/32/ -lmkl_lapack -lmkl_ia32 -lguide -lf2c # This works with MKL 8.0.1 from
                                             # http://www.intel.com/cd/software/products/asmo-na/eng/perflib/mkl/index.htm
+endif
 
 LIBS=-lsba $(LAPACKLIBS) -lm
-LDFLAGS=$(ARCHFLAGS) -L..
+LDFLAGS=-L.. # for 
 
-libsbaprojs.so: 
-	$(CC) -fPIC -c sbaprojs.h sbaprojs.c imgproj.c $(CFLAGS)
-	$(CC) -shared -Wall $(LDFLAGS) $(OBJS) -o libsbaprojs.so $(LIBS)
-# do i need to include -lsba and have libsba.so somewhere?!
-# answer is yes - they must be in the default Ubuntu 12.04 places
-# /usr/local/lib/libsba.so
-# /usr/local/include/sba.h
+libsbaprojs.so:
+ifeq ($(OS),macOS)
+	$(CC) $(CFLAGS) -fPIC -c sbaprojs.h sbaprojs.c imgproj.c -target arm64-apple-macos11
+	$(CC) $(CFLAGS) $(OBJS) -o libsbaprojs_a64.dylib -shared $(LDFLAGS) $(LIBS) -target arm64-apple-macos11
+	$(CC) $(CFLAGS) -fPIC -c sbaprojs.h sbaprojs.c imgproj.c -target x86_64-apple-macos10.6
+	$(CC) $(CFLAGS) $(OBJS) -o libsbaprojs_x64.dylib -shared $(LDFLAGS) $(LIBS) -target x86_64-apple-macos10.6
+	lipo -create -output libsbaprojs.dylib libsbaprojs_a64.dylib libsbaprojs_x64.dylib
+else 
+	$(CC) $(CFLAGS) -fPIC -c sbaprojs.h sbaprojs.c imgproj.c 
+	$(CC) $(CFLAGS) $(OBJS) -o libsbaprojs.so -shared $(LDFLAGS) $(LIBS)
+endif
 
-install:
+install: # linux example
 	@chmod a-x libsbaprojs.so
 	@cp libsbaprojs.so /usr/local/lib/libsbaprojs.so.1.6.0
 	@rm -f /usr/local/lib/libsbaprojs.so
@@ -43,9 +62,11 @@ install:
 
 clean:
 	@rm -f $(OBJS)
+	@rm -f *_*dylib
 
 realclean cleanall: clean
 	@rm -f libsbaprojs.so
+	@rm -f libsbaprojs.dylib
 
 depend:
 	makedepend -f Makefile $(SRCS)

@@ -13,6 +13,13 @@ not see); and the definition of his globs_ struct which is one of
 the input arguments to some of these projections. 
 */
 
+// for building Windows DLLs
+#ifndef WINDLL
+	#define DLLEXPORT
+#else
+	#define DLLEXPORT __declspec(dllexport)
+#endif
+
 #ifndef _SBA_PROJS_H_
 #define _SBA_PROJS_H_
 
@@ -26,7 +33,7 @@ the input arguments to some of these projections.
 
 #define FULLQUATSZ 4
 
-#include <sba.h>
+#include "sba.h"
 // is this OK to do?  need it so use of struct Crsm here in sbaprojs.h doesn't confuse things
 
 /* in imgproj.c */
@@ -50,65 +57,65 @@ extern void calcDistImgProjJacS(double a[5], double kc[5], double qr0[4], double
 arguments for use with sba */
 
 // simple mode, full bundle adjustment
-extern void img_projRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
-extern void img_projRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *xij, void *adata);
+DLLEXPORT extern void img_projRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *xij, void *adata);
 
 // simple mode, bundle adjustment for camera motion only
-extern void img_projRT(int j, int i, double *aj, double *xij, void *adata);
-extern void img_projRT_jac(int j, int i, double *aj, double *Aij, void *adata);
+DLLEXPORT extern void img_projRT(int j, int i, double *aj, double *xij, void *adata);
+DLLEXPORT extern void img_projRT_jac(int j, int i, double *aj, double *Aij, void *adata);
 
 // simple mode, bundle adjustment for structure parameters only
-extern void img_projS(int j, int i, double *bi, double *xij, void *adata);
-extern void img_projS_jac(int j, int i, double *bi, double *Bij, void *adata);
+DLLEXPORT extern void img_projS(int j, int i, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projS_jac(int j, int i, double *bi, double *Bij, void *adata);
 
 // expert mode, full bundle adjustment
-extern void img_projsRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 
 // expert mode, camera motion only
-extern void img_projsRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 
 // expert mode, structure parameters only
-extern void img_projsS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 
 
 
 
 // simple mode, for camera with no distortion? 
-extern void img_projKRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
-extern void img_projKRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *Bij, void *adata);
-extern void img_projKRT(int j, int i, double *aj, double *xij, void *adata);
-extern void img_projKRT_jac(int j, int i, double *aj, double *Aij, void *adata);
-extern void img_projKS(int j, int i, double *bi, double *xij, void *adata);
-extern void img_projKS_jac(int j, int i, double *bi, double *Bij, void *adata);
+DLLEXPORT extern void img_projKRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projKRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *Bij, void *adata);
+DLLEXPORT extern void img_projKRT(int j, int i, double *aj, double *xij, void *adata);
+DLLEXPORT extern void img_projKRT_jac(int j, int i, double *aj, double *Aij, void *adata);
+DLLEXPORT extern void img_projKS(int j, int i, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projKS_jac(int j, int i, double *bi, double *Bij, void *adata);
 
 // expert mode for camera with no distortion???
-extern void img_projsKRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
-extern void img_projsKRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
-extern void img_projsKS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 
 
 
 // simple mode for cameras, structure and motion with distortion
-extern void img_projKDRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
-extern void img_projKDRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *Bij, void *adata);
-extern void img_projKDRT(int j, int i, double *aj, double *xij, void *adata);
-extern void img_projKDRT_jac(int j, int i, double *aj, double *Aij, void *adata);
-extern void img_projKDS(int j, int i, double *bi, double *xij, void *adata);
-extern void img_projKDS_jac(int j, int i, double *bi, double *Bij, void *adata);
+DLLEXPORT extern void img_projKDRTS(int j, int i, double *aj, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projKDRTS_jac(int j, int i, double *aj, double *bi, double *Aij, double *Bij, void *adata);
+DLLEXPORT extern void img_projKDRT(int j, int i, double *aj, double *xij, void *adata);
+DLLEXPORT extern void img_projKDRT_jac(int j, int i, double *aj, double *Aij, void *adata);
+DLLEXPORT extern void img_projKDS(int j, int i, double *bi, double *xij, void *adata);
+DLLEXPORT extern void img_projKDS_jac(int j, int i, double *bi, double *Bij, void *adata);
 
 // expert mode for cameras, structure and motion with distortion
-extern void img_projsKDRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKDRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
-extern void img_projsKDRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKDRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
-extern void img_projsKDS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
-extern void img_projsKDS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKDRTS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKDRTS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKDRT_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKDRT_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
+DLLEXPORT extern void img_projsKDS_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *hx, void *adata);
+DLLEXPORT extern void img_projsKDS_jac_x(double *p, struct sba_crsm *idxij, int *rcidxs, int *rcsubs, double *jac, void *adata);
 
 
 

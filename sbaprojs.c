@@ -21,7 +21,7 @@ the input arguments to some of these projections.
 #include <time.h>
 
 
-#include <sba.h> // This must be installed in /usr/local/include
+#include "sba.h" // in the directory above
 #include "sbaprojs.h"
 
 
@@ -43,7 +43,7 @@ struct globs_ globs;
 /*
  * multiplication of the two quaternions in q1 and q2 into p
  */
-inline static void quatMult(double q1[FULLQUATSZ], double q2[FULLQUATSZ], double p[FULLQUATSZ])
+__inline void quatMult(double q1[FULLQUATSZ], double q2[FULLQUATSZ], double p[FULLQUATSZ])
 {
   p[0]=q1[0]*q2[0]-q1[1]*q2[1]-q1[2]*q2[2]-q1[3]*q2[3];
   p[1]=q1[0]*q2[1]+q2[0]*q1[1]+q1[2]*q2[3]-q1[3]*q2[2];
@@ -58,7 +58,7 @@ inline static void quatMult(double q1[FULLQUATSZ], double q2[FULLQUATSZ], double
  *
  * total additions increase from 12 to 27 (28), but total multiplications decrease from 16 to 9 (12)
  */
-inline static void quatMultFast(double q1[FULLQUATSZ], double q2[FULLQUATSZ], double p[FULLQUATSZ])
+__inline void quatMultFast(double q1[FULLQUATSZ], double q2[FULLQUATSZ], double p[FULLQUATSZ])
 {
 double t1, t2, t3, t4, t5, t6, t7, t8, t9;
 //double t10, t11, t12;
